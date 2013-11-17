@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/js/jquery.json-form.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      var schema = {
+          "title": "Example Schema",
+          "type": "object",
+          "properties": {
+              "firstName": {
+                  "type": "string"
+              },
+              "lastName": {
+                  "type": "string"
+              },
+              "age": {
+                  "description": "Age in years",
+                  "type": "integer",
+                  "minimum": 0
+              }
+          },
+          "required": ["firstName", "lastName"]
+      };
+      $('body').append($.jsonForm());
+    </script>
+  </body>
+</html>
