@@ -67,6 +67,17 @@ _.extend(JsonValidator.prototype, {
     inline: true
 });
 
+function JsonEnum(schema, data) {
+    this.initialize(schema, data);
+};
+_.extend(JsonEnum.prototype, JsonValidator.prototype, {
+    valid: function () {
+        return this.schema.enum.indexOf(this.value()) !== -1;
+    },
+
+    inline: false
+});
+
 function JsonArray(schema, data) {
     this.initialize(schema, data);
 };
@@ -94,7 +105,7 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
         return this;
     },
 
-    value:  function () {
+    value: function () {
         return _.map(this.items, function (validator) {
             return validator.value();
         });

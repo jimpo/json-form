@@ -2,7 +2,6 @@
   <head>
     <title>JSON Form Demo</title>
 
-    <!-- link rel="stylesheet" href="bower_components/normalize-css/normalize.css" -->
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/json-form.css">
 
@@ -47,6 +46,10 @@
                         "additionalProperties": {"type": "string"}
                       }
                   }
+              },
+              "color": {
+                   "enum": ["red", "green", 25],
+                   "default": "green"
               },
               "myNull": {
                   "type": "null"

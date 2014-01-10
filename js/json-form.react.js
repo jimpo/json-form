@@ -77,6 +77,42 @@
         }
     });
 
+    JsonEnum.prototype.view = React.createClass({
+        handleChange: function (value) {
+            this.props.validator.setData(value);
+            this.props.onChange(this.props.validator);
+        },
+
+        _inputs: function () {
+            // TODO: Use schema path instead of random number
+            var id = Math.floor(Math.random() * 10000);
+            return _.map(this.props.validator.schema.enum, function (element) {
+                return (
+                    <div className="json-form-row">
+                      <div className="json-form-control">
+                        <input
+                          type="radio"
+                          name={id}
+                          checked={this.props.validator.value() == element}
+                          onChange={this.handleChange.bind(this, element)}>
+                          {' '}
+                          {element}
+                        </input>
+                      </div>
+                    </div>
+                );
+            }, this);
+        },
+
+        render: function () {
+            return (
+                <div className="json-enum">
+                  {this._inputs()}
+                </div>
+            );
+        }
+    });
+
     JsonArray.prototype.view = React.createClass({
         handleNewItem: function () {
             var validator = this.props.validator;

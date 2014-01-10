@@ -8,13 +8,13 @@
     border: 1px solid black;
 }
 
-li.json-form-row label {
+.json-form-row label {
     display: inline-block;
     width: 100px;
     padding: 0px 10px;
 }
 
-li.json-form-row label input {
+.json-form-row label input {
     width: 100%;
 }
 
@@ -27,13 +27,13 @@ ul.json-properties {
     padding: 0px;
 }
 
-li.json-form-row {
+.json-form-row {
     background-color: white;
     border: 1px solid gray;
     border-bottom: none;
 }
 
-li.json-form-row:last-child {
+.json-form-row:last-child {
     border-bottom: 1px solid gray;
 }
 
@@ -47,7 +47,7 @@ li.json-form-row:last-child {
     display: none;
 }
 
-.collapsible li.json-form-row {
+.collapsible .json-form-row {
     border-right: 0px;
 }
 
