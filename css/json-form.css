@@ -1,0 +1,66 @@
+.json-null {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.json-form {
+    background-color: lightgray;
+    border: 1px solid black;
+}
+
+li.json-form-row label {
+    display: inline-block;
+    width: 100px;
+    padding: 0px 10px;
+}
+
+li.json-form-row label input {
+    width: 100%;
+}
+
+ul.json-properties {
+    list-style: none;
+    padding: 0px;
+}
+
+.collapsible ol.json-items {
+    padding: 0px;
+}
+
+li.json-form-row {
+    background-color: white;
+    border: 1px solid gray;
+    border-bottom: none;
+}
+
+li.json-form-row:last-child {
+    border-bottom: 1px solid gray;
+}
+
+.collapsible {
+    background-color: gainsboro;
+    padding: 5px 0px 5px 35px;
+    border-top: 1px solid gray;
+}
+
+.collapsible.collapsed {
+    display: none;
+}
+
+.collapsible li.json-form-row {
+    border-right: 0px;
+}
+
+.json-form-control {
+    padding: 3px;
+}
+
+.json-form-error {
+    color: red;
+}
+
+button.glyphicon {
+    border: 0px;
+    background-color: transparent;
+    padding: 0px;
+}

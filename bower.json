@@ -1,0 +1,13 @@
+{
+    "name": "json-form",
+    "version": "0.0.1",
+    "main": "js/json-form.js",
+    "dependencies": {
+        "react": "~0.8.0",
+        "underscore": "~1.5.2"
+    },
+    "devDependencies": {
+        "mocha": "~1.17.0",
+        "chai": "~1.8.1"
+    }
+}
