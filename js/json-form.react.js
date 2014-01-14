@@ -55,6 +55,23 @@
         }
     });
 
+    JsonText.prototype.view = React.createClass({
+        handleChange: function (e) {
+            this.props.validator.setData(e.target.value);
+            this.props.onChange(this.props.validator);
+        },
+
+        render: function () {
+            return (
+                <textarea
+                  onChange={this.handleChange}
+                  type="text"
+                  value={this.props.validator.value()}
+                />
+            );
+        }
+    });
+
     JsonNumber.prototype.view = React.createClass({
         handleChange: function (e) {
             var value;
@@ -123,7 +140,7 @@
         },
 
         handleRemoveItem: function (i) {
-            this.props.validator.items.splice(i, 1);
+            this.props.validator.removeItem(i);
             this.props.onChange(this.props.validator);
         },
 

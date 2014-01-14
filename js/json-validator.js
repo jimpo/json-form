@@ -8,6 +8,15 @@ function JsonValidator(schema, data, root, fragments) {
     if (schema['$ref']) {
         schema = this.resolveReference(schema['$ref'], root, fragments);
     }
+    if (schema.allOf) {
+        schema = _.defaults.apply(this, _.map(schema.allOf, function (schema) {
+            if (schema['$ref']) {
+                return this.resolveReference(schema['$ref'], root, fragments);
+            }
+            return schema;
+        }, this));
+    }
+
     if (schema.enum) {
         validatorClass = JsonEnum;
     }
@@ -30,7 +39,8 @@ function JsonValidator(schema, data, root, fragments) {
             validatorClass = JsonObject;
             break;
         case 'string':
-            validatorClass = JsonString;
+            validatorClass =
+                schema.display === 'text' ? JsonText : JsonString;
             break;
         default:
             break;
@@ -99,6 +109,26 @@ function JsonArray(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
 };
 _.extend(JsonArray.prototype, JsonValidator.prototype, {
+    validations: {
+        minItems: function (minItems, data) {
+            if (data.length < minItems) {
+                return "Must have at least " + minItems + " items";
+            }
+        },
+
+        maxItems: function (maxItems, data) {
+            if (data.length > maxItems) {
+                return "Must have at most " + maxItems + " items";
+            }
+        },
+    },
+
+    removeItem: function (i) {
+        var value = this.value();
+        value.splice(i, 1);
+        this.setData(value);
+    },
+
     setData: function (data) {
         this.errors = [];
         this.items = [];
@@ -123,6 +153,7 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
                     this.schema.items, data[i], this.root, fragments);
             }
         }
+        this.validate();
         return this;
     },
 
@@ -230,6 +261,13 @@ _.extend(JsonString.prototype, JsonValidator.prototype, {
     setData: function (data) {
         return JsonValidator.prototype.setData.call(this, data || "");
     }
+});
+
+function JsonText(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
+};
+_.extend(JsonText.prototype, JsonString.prototype, {
+    inline: false
 });
 
 function JsonBoolean(schema, data, root, fragments) {

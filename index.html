@@ -37,7 +37,8 @@
                   "$ref": "#/definitions/jim"
               },
               "lastName": {
-                  "type": "string"
+                  "type": "string",
+                  "display": "text"
               },
               "eyeColor": {
                   "title": "Eye Color",
@@ -59,11 +60,17 @@
                   "type": "null"
               },
               "myNumber": {
-                  "type": "integer",
-                  "minimum": -3,
-                  "exclusiveMaximum": 9,
-                  "multipleOf": 3,
-                  "default": 5
+                  "allOf" : [
+                      {
+                          "type": "integer",
+                          "minimum": -3
+                      },
+                      {
+                          "exclusiveMaximum": 9,
+                          "multipleOf": 3,
+                          "default": 5
+                      }
+                  ]
               },
               "pets": {
                   "type": "array",
