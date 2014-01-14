@@ -25,12 +25,16 @@
 
       var schema = {
           "type": "object",
-          "properties": {
-              "firstName": {
-                  "title": "First Name",
+          "definitions": {
+              "jim": {
                   "type": "string",
                   "maxLength": 10,
-                  "pattern": "Jim+y",
+                  "pattern": "Jim+y"
+              }
+          },
+          "properties": {
+              "firstName": {
+                  "$ref": "#/definitions/jim"
               },
               "lastName": {
                   "type": "string"

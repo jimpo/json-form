@@ -1,7 +1,13 @@
 'use strict';
 
-function JsonValidator(schema, data) {
+function JsonValidator(schema, data, root, fragments) {
+    root = root || schema;
+    fragments = fragments || [];
+
     var validatorClass;
+    if (schema['$ref']) {
+        schema = this.resolveReference(schema['$ref'], root, fragments);
+    }
     if (schema.enum) {
         validatorClass = JsonEnum;
     }
@@ -30,7 +36,7 @@ function JsonValidator(schema, data) {
             break;
         }
     }
-    return new validatorClass(schema, data);
+    return new validatorClass(schema, data, root, fragments);
 };
 _.extend(JsonValidator.prototype, {
     validations: {},
@@ -52,8 +58,10 @@ _.extend(JsonValidator.prototype, {
         return this.data;
     },
 
-    initialize: function (schema, data) {
+    initialize: function (schema, data, root, fragments) {
         this.schema = schema;
+        this.root = root;
+        this.fragments = fragments;
         this.setData(data === undefined ? schema.default : data);
     },
 
@@ -62,6 +70,15 @@ _.extend(JsonValidator.prototype, {
         this.errors = [];
         this.validate();
         return this;
+    },
+
+    resolveReference: function (uri, schema) {
+        // TODO: Handle this more generally
+        var fragmentPath = uri.split('#')[1];
+        var uriFragments = fragmentPath.split('/').slice(1); // First one is ''
+        return _.reduce(uriFragments, function (schema, fragment) {
+            return schema[fragment];
+        }, schema);
     },
 
     inline: true
@@ -78,8 +95,8 @@ _.extend(JsonEnum.prototype, JsonValidator.prototype, {
     inline: false
 });
 
-function JsonArray(schema, data) {
-    this.initialize(schema, data);
+function JsonArray(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
 };
 _.extend(JsonArray.prototype, JsonValidator.prototype, {
     setData: function (data) {
@@ -89,7 +106,9 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
 
         if (typeof(this.schema.items) === 'array') {
             for (var i = 0; i < data.length; i++) {
-                this.items[i] = new JsonValidator(this.schema.items[i], data[i]);
+                var fragments = this.fragments.concat([i]);
+                this.items[i] = new JsonValidator(
+                    this.schema.items[i], data[i], this.root, fragments);
             }
         }
         else if (typeof(this.schema.items) === 'object') {
@@ -99,7 +118,9 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
                 length = this.schema.minItems;
             }
             for (var i = 0; i < length; i++) {
-                this.items[i] = new JsonValidator(this.schema.items, data[i]);
+                var fragments = this.fragments.concat([i]);
+                this.items[i] = new JsonValidator(
+                    this.schema.items, data[i], this.root, fragments);
             }
         }
         return this;
@@ -121,8 +142,8 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
     inline: false
 });
 
-function JsonObject(schema, data) {
-    this.initialize(schema, data);
+function JsonObject(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
 }
 _.extend(JsonObject.prototype, JsonValidator.prototype, {
     setData: function (data) {
@@ -141,7 +162,9 @@ _.extend(JsonObject.prototype, JsonValidator.prototype, {
             }
 
             if (subschema) {
-                this.properties[key] = new JsonValidator(subschema, property);
+                var fragments = this.fragments.concat([key]);
+                this.properties[key] = new JsonValidator(
+                    subschema, property, this.root, fragments);
             }
             else {
                 this.errors.push('Unknown property: ' + key);
@@ -150,7 +173,10 @@ _.extend(JsonObject.prototype, JsonValidator.prototype, {
 
         _.each(this.schema.required || [], function (key) {
             if (!data.hasOwnProperty(key)) {
-                this.properties[key] = new JsonValidator(this.schema.properties[key]);
+                var subschema = this.schema.properties[key];
+                var fragments = this.fragments.concat([key]);
+                this.properties[key] = new JsonValidator(
+                    subschema, undefined, this.root, fragments);
             }
         }, this);
         return this;
@@ -179,8 +205,8 @@ _.extend(JsonObject.prototype, JsonValidator.prototype, {
     inline: false
 });
 
-function JsonString(schema, data) {
-    this.initialize(schema, data);
+function JsonString(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
 };
 _.extend(JsonString.prototype, JsonValidator.prototype, {
     validations: {
@@ -206,8 +232,8 @@ _.extend(JsonString.prototype, JsonValidator.prototype, {
     }
 });
 
-function JsonBoolean(schema, data) {
-    this.initialize(schema, data);
+function JsonBoolean(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
 };
 _.extend(JsonBoolean.prototype, JsonValidator.prototype, {
     setData: function (data) {
@@ -215,12 +241,12 @@ _.extend(JsonBoolean.prototype, JsonValidator.prototype, {
     }
 });
 
-function JsonNull(schema, _data) {
+function JsonNull(schema) {
     this.schema = schema;
     this.errors = [];
 };
 _.extend(JsonNull.prototype, {
-    setData: function (_data) {
+    setData: function () {
         return this;
     },
 
@@ -235,8 +261,8 @@ _.extend(JsonNull.prototype, {
     inline: true
 });
 
-function JsonNumber(schema, data) {
-    this.initialize(schema, data);
+function JsonNumber(schema, data, root, fragments) {
+    this.initialize(schema, data, root, fragments);
 };
 _.extend(JsonNumber.prototype, JsonValidator.prototype, {
     validations: {
