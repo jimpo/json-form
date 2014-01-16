@@ -518,7 +518,7 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
                 return (
                     React.DOM.li( {className:"json-form-row"}, 
                       React.DOM.div( {className:"json-form-control"}, 
-                        React.DOM.button( {onClick:this.handleNewItem}, 
+                        React.DOM.button( {type:"button", onClick:this.handleNewItem}, 
                           " Add item "
                         )
                       )
@@ -580,7 +580,8 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
                     else {
                         propertyView =
                             React.DOM.button(
-                              {onClick:this.handleAddProperty.bind(this, key)}, 
+                              {type:"button",
+                              onClick:this.handleAddProperty.bind(this, key)}, 
                               " Add property "
                             );
                     }
@@ -627,7 +628,7 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
                         React.DOM.label(null, 
                           React.DOM.input( {ref:"additionalProperty", type:"text"})
                         ),
-                        React.DOM.button( {onClick:this.handleNewProperty}, 
+                        React.DOM.button( {type:"button", onClick:this.handleNewProperty}, 
                           " Add property "
                         )
                       )
@@ -664,7 +665,8 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
             if (this.props.onRemove) {
                 return (
                     React.DOM.button(
-                      {className:"glyphicon glyphicon-remove",
+                      {type:"button",
+                      className:"glyphicon glyphicon-remove",
                       onClick:this.props.onRemove})
                 );
             }
@@ -708,7 +710,8 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
                       React.DOM.div( {className:"json-form-control collapser"}, 
                         this._label(),
                         React.DOM.button(
-                          {className:"glyphicon glyphicon-expand",
+                          {type:"button",
+                          className:"glyphicon glyphicon-expand",
                           onClick:this.handleExpand}),
                         ' ',
                         this._removeButton(),
@@ -727,7 +730,8 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
                       React.DOM.div( {className:"json-form-control collapser"}, 
                         this._label(),
                         React.DOM.button(
-                          {className:"glyphicon glyphicon-collapse-down",
+                          {type:"button",
+                          className:"glyphicon glyphicon-collapse-down",
                           onClick:this.handleCollapse}),
                         ' ',
                         this._removeButton(),

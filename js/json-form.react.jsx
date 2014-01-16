@@ -172,7 +172,7 @@
                 return (
                     <li className="json-form-row">
                       <div className="json-form-control">
-                        <button onClick={this.handleNewItem}>
+                        <button type="button" onClick={this.handleNewItem}>
                           Add item
                         </button>
                       </div>
@@ -234,6 +234,7 @@
                     else {
                         propertyView =
                             <button
+                              type="button"
                               onClick={this.handleAddProperty.bind(this, key)}>
                               Add property
                             </button>;
@@ -281,7 +282,7 @@
                         <label>
                           <input ref="additionalProperty" type="text"/>
                         </label>
-                        <button onClick={this.handleNewProperty}>
+                        <button type="button" onClick={this.handleNewProperty}>
                           Add property
                         </button>
                       </div>
@@ -318,6 +319,7 @@
             if (this.props.onRemove) {
                 return (
                     <button
+                      type="button"
                       className="glyphicon glyphicon-remove"
                       onClick={this.props.onRemove}/>
                 );
@@ -362,6 +364,7 @@
                       <div className="json-form-control collapser">
                         {this._label()}
                         <button
+                          type="button"
                           className="glyphicon glyphicon-expand"
                           onClick={this.handleExpand}/>
                         {' '}
@@ -381,6 +384,7 @@
                       <div className="json-form-control collapser">
                         {this._label()}
                         <button
+                          type="button"
                           className="glyphicon glyphicon-collapse-down"
                           onClick={this.handleCollapse}/>
                         {' '}
