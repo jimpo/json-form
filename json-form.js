@@ -3,49 +3,17 @@
 function JsonValidator(schema, data, root, fragments) {
     root = root || schema;
     fragments = fragments || [];
+    schema = this.resolveSchema(schema, root, fragments);
 
     var validatorClass;
-    if (schema['$ref']) {
-        schema = this.resolveReference(schema['$ref'], root, fragments);
-    }
-    if (schema.allOf) {
-        schema = _.defaults.apply(this, _.map(schema.allOf, function (schema) {
-            if (schema['$ref']) {
-                return this.resolveReference(schema['$ref'], root, fragments);
-            }
-            return schema;
-        }, this));
-    }
-
-    if (schema.enum) {
-        validatorClass = JsonEnum;
-    }
-    else {
-        switch (schema.type) {
-        case 'array':
-            validatorClass = JsonArray;
-            break;
-        case 'boolean':
-            validatorClass = JsonBoolean;
-            break;
-        case 'integer':
-        case 'number':
-            validatorClass = JsonNumber;
-            break;
-        case 'null':
-            validatorClass = JsonNull;
-            break;
-        case 'object':
-            validatorClass = JsonObject;
-            break;
-        case 'string':
-            validatorClass =
-                schema.display === 'text' ? JsonText : JsonString;
-            break;
-        default:
+    for (var i = JsonValidator.validators.length - 1; i >= 0; i--) {
+        validatorClass = JsonValidator.validators[i];
+        if (validatorClass.validatesSchema(schema)) {
             break;
         }
+        validatorClass = null;
     }
+
     return new validatorClass(schema, data, root, fragments);
 };
 _.extend(JsonValidator.prototype, {
@@ -91,6 +59,21 @@ _.extend(JsonValidator.prototype, {
         }, schema);
     },
 
+    resolveSchema: function (schema, root) {
+        if (schema['$ref']) {
+            schema = this.resolveReference(schema['$ref'], root);
+        }
+        if (schema.allOf) {
+            var schemata = _.map(schema.allOf, function (schema) {
+                return this.resolveSchema(schema, root);
+            }, this);
+            schemata.push(schema);
+            schema = _.extend.apply(this, schemata);
+            delete schema.allOf;
+        }
+        return schema;
+    },
+
     inline: true
 });
 
@@ -104,6 +87,9 @@ _.extend(JsonEnum.prototype, JsonValidator.prototype, {
 
     inline: false
 });
+JsonEnum.validatesSchema = function (schema) {
+    return schema.hasOwnProperty('enum');
+};
 
 function JsonArray(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -172,6 +158,9 @@ _.extend(JsonArray.prototype, JsonValidator.prototype, {
 
     inline: false
 });
+JsonArray.validatesSchema = function (schema) {
+    return schema.type === 'array';
+};
 
 function JsonObject(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -235,6 +224,9 @@ _.extend(JsonObject.prototype, JsonValidator.prototype, {
 
     inline: false
 });
+JsonObject.validatesSchema = function (schema) {
+    return schema.type === 'object';
+};
 
 function JsonString(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -262,6 +254,9 @@ _.extend(JsonString.prototype, JsonValidator.prototype, {
         return JsonValidator.prototype.setData.call(this, data || "");
     }
 });
+JsonString.validatesSchema = function (schema) {
+    return schema.type === 'string';
+};
 
 function JsonText(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -269,6 +264,9 @@ function JsonText(schema, data, root, fragments) {
 _.extend(JsonText.prototype, JsonString.prototype, {
     inline: false
 });
+JsonText.validatesSchema = function (schema) {
+    return schema.type === 'string' && schema.display === 'text';
+};
 
 function JsonBoolean(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -278,6 +276,9 @@ _.extend(JsonBoolean.prototype, JsonValidator.prototype, {
         return JsonValidator.prototype.setData.call(this, data || false);
     }
 });
+JsonBoolean.validatesSchema = function (schema) {
+    return schema.type === 'boolean';
+};
 
 function JsonNull(schema) {
     this.schema = schema;
@@ -298,6 +299,9 @@ _.extend(JsonNull.prototype, {
 
     inline: true
 });
+JsonNull.validatesSchema = function (schema) {
+    return schema.type === 'null';
+};
 
 function JsonNumber(schema, data, root, fragments) {
     this.initialize(schema, data, root, fragments);
@@ -343,6 +347,20 @@ _.extend(JsonNumber.prototype, JsonValidator.prototype, {
         }
     }
 });
+JsonNumber.validatesSchema = function (schema) {
+    return schema.type === 'number' || schema.type === 'integer';
+};
+
+JsonValidator.validators = [
+    JsonArray,
+    JsonObject,
+    JsonString,
+    JsonText,
+    JsonBoolean,
+    JsonNull,
+    JsonNumber,
+    JsonEnum,
+];
 
 /** @jsx React.DOM */
 
